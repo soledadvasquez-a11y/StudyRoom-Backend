@@ -37,5 +37,12 @@ export class AuthController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
+
+  async checkAuth(req: Request, res: Response): Promise<void> {
+    res.status(200).json({
+      status: 'success',
+      message: 'Token válido y acceso permitido'
+    });
+  }
 }
 

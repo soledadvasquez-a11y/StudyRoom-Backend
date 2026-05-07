@@ -12,4 +12,7 @@ const authController = new AuthController(loginUseCase);
 
 authRouter.post('/login', authController.login.bind(authController));
 
+// TODO: Añadir middleware de validación JWT aquí.
+authRouter.get('/checkAuth', authController.checkAuth.bind(authController));
+
 export { authRouter };
