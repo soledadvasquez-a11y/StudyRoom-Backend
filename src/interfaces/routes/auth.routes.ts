@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { AuthController } from '../controllers/AuthController';
 import { LoginUseCase } from '../../application/LoginUseCase';
 import { DummyUserRepository } from '../../infrastructure/DummyUserRepository';
+import { authenticateToken } from '../middleware/authMiddleware';
 
 const authRouter = Router();
 
@@ -12,7 +13,6 @@ const authController = new AuthController(loginUseCase);
 
 authRouter.post('/login', authController.login.bind(authController));
 
-// TODO: Añadir middleware de validación JWT aquí.
-authRouter.get('/checkAuth', authController.checkAuth.bind(authController));
+authRouter.get('/checkAuth', authenticateToken, authController.checkAuth.bind(authController));
 
 export { authRouter };
