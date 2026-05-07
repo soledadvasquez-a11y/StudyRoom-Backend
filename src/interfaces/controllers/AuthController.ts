@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import { LoginUseCase } from '../../application/LoginUseCase';
+import { JWT_SECRET, JWT_EXPIRES_IN } from '../middleware/authMiddleware';
 
 export class AuthController {
   constructor(private readonly loginUseCase: LoginUseCase) {}
@@ -15,8 +17,19 @@ export class AuthController {
 
       const result = await this.loginUseCase.execute(username, password);
 
-      if (result.success) {
-        res.status(200).json(result);
+      if (result.success && result.username) {
+        // Generar el token JWT con el username como payload
+        const token = jwt.sign(
+          { username: result.username },
+          JWT_SECRET,
+          { expiresIn: JWT_EXPIRES_IN }
+        );
+
+        res.status(200).json({
+          success: true,
+          message: result.message,
+          token,
+        });
       } else {
         res.status(401).json(result);
       }
@@ -25,3 +38,4 @@ export class AuthController {
     }
   }
 }
+
