@@ -1,8 +1,9 @@
-import { Router } from 'express';
+//src/interfaces/routes/auth.routes.ts
 import { AuthController } from '../controllers/AuthController';
 import { LoginUseCase } from '../../application/LoginUseCase';
 import { DummyUserRepository } from '../../infrastructure/DummyUserRepository';
 import { authenticateToken } from '../middleware/authMiddleware';
+import { Router } from 'express';
 
 const authRouter = Router();
 
