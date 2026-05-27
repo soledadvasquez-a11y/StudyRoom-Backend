@@ -9,7 +9,31 @@ import { musicRouter } from "./interfaces/routes/music.routes";
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL,
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Permite peticiones sin origin, como Postman, navegador directo o health checks
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("No permitido por CORS"));
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 app.get("/", (_req, res) => {
@@ -20,6 +44,8 @@ app.use("/api/auth", authRouter);
 app.use("/api/ping", pingRouter);
 app.use("/api/music", musicRouter);
 
-app.listen(3000, "0.0.0.0", () => {
-  console.log("Server running on port 3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(Number(PORT), "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
 });
