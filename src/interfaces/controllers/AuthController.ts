@@ -1,48 +1,52 @@
-import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import { LoginUseCase } from '../../application/LoginUseCase';
-import { JWT_SECRET, JWT_EXPIRES_IN } from '../middleware/authMiddleware';
+import { Request, Response } from "express";
+import { RegisterUser } from "../../application/use-cases/RegisterUser";
+import { LoginUser } from "../../application/use-cases/LoginUser";
 
 export class AuthController {
-  constructor(private readonly loginUseCase: LoginUseCase) {}
+  constructor(
+    private registerUseCase: RegisterUser,
+    private loginUseCase: LoginUser,
+  ) {}
 
-  async login(req: Request, res: Response): Promise<void> {
+  async register(req: Request, res: Response) {
     try {
-      const { username, password } = req.body;
+      const { email, username, password } = req.body;
 
-      if (!username || !password) {
-        res.status(400).json({ error: 'Username and password are required' });
-        return;
+      if (!email || !username || !password) {
+        throw new Error("Faltan datos para completar el registro");
       }
 
-      const result = await this.loginUseCase.execute(username, password);
-
-      if (result.success && result.username) {
-        // Generar el token JWT con el username como payload
-        const token = jwt.sign(
-          { username: result.username },
-          JWT_SECRET,
-          { expiresIn: JWT_EXPIRES_IN }
-        );
-
-        res.status(200).json({
-          success: true,
-          message: result.message,
-          token,
-        });
-      } else {
-        res.status(401).json(result);
-      }
-    } catch (error) {
-      res.status(500).json({ error: 'Internal server error' });
+      const result = await this.registerUseCase.execute(
+        email,
+        username,
+        password,
+      );
+      res.status(201).json(result);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
     }
   }
 
-  async checkAuth(req: Request, res: Response): Promise<void> {
-    res.status(200).json({
-      status: 'success',
-      message: 'Token válido y acceso permitido'
-    });
+  async login(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        throw new Error("Faltan datos para iniciar sesión");
+      }
+
+      const result = await this.loginUseCase.execute(email, password);
+      res.status(200).json(result);
+    } catch (err: any) {
+      res.status(401).json({ error: err.message });
+    }
+  }
+
+  async checkAuth(req: Request, res: Response) {
+    try {
+      res.status(200).json({ message: "Autenticado", user: (req as any).user });
+    } catch (err: any) {
+      res.status(401).json({ error: err.message });
+    }
   }
 }
-

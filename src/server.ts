@@ -7,12 +7,17 @@ import { authRouter } from "./interfaces/routes/auth.routes";
 import { pingRouter } from "./interfaces/routes/ping.routes";
 import { musicRouter } from "./interfaces/routes/music.routes";
 
+import { SupabaseUserRepository } from "./infrastructure/repositories/SupabaseUserRepository";
+import { RegisterUser } from "./application/use-cases/RegisterUser";
+import { LoginUser } from "./application/use-cases/LoginUser";
+import { AuthController } from "./interfaces/controllers/AuthController";
 const app = express();
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  process.env.FRONTEND_URL,
-];
+const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
+const userRepo = new SupabaseUserRepository();
+const registerUseCase = new RegisterUser(userRepo);
+const loginUseCase = new LoginUser(userRepo);
+const authController = new AuthController(registerUseCase, loginUseCase);
 
 app.use(
   cors({
@@ -31,7 +36,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());
@@ -49,3 +54,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(Number(PORT), "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
+app.post("/api/register", (req, res) => authController.register(req, res));
+app.post("/api/login", (req, res) => authController.login(req, res));
