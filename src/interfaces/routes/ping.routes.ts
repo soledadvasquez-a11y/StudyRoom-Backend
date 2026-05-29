@@ -1,9 +1,8 @@
-import { Router } from 'express';
-import { PingController } from '../controllers/PingController';
+import { Router } from "express";
+import { pingController } from "../../config/dependencies";
 
 const pingRouter = Router();
-const pingController = new PingController();
 
-pingRouter.get('/ping', pingController.ping.bind(pingController));
+pingRouter.get("/ping", pingController.ping.bind(pingController));
 
 export { pingRouter };

@@ -1,18 +1,9 @@
 //src/interfaces/routes/auth.routes.ts
-import { AuthController } from "../controllers/AuthController";
-import { SupabaseUserRepository } from "../../infrastructure/repositories/SupabaseUserRepository";
-import { RegisterUser } from "../../application/use-cases/RegisterUser";
-import { LoginUser } from "../../application/use-cases/LoginUser";
-import { authenticateToken } from "../middleware/authMiddleware";
 import { Router } from "express";
+import { authController } from "../../config/dependencies";
+import { authenticateToken } from "../middleware/authMiddleware";
 
 const authRouter = Router();
-
-// Inyección de dependencias
-const userRepository = new SupabaseUserRepository();
-const registerUseCase = new RegisterUser(userRepository);
-const loginUseCase = new LoginUser(userRepository);
-const authController = new AuthController(registerUseCase, loginUseCase);
 
 authRouter.post("/register", authController.register.bind(authController));
 authRouter.post("/login", authController.login.bind(authController));
