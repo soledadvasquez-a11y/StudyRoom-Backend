@@ -11,6 +11,7 @@ import { SupabaseUserRepository } from "./infrastructure/repositories/SupabaseUs
 import { RegisterUser } from "./application/use-cases/RegisterUser";
 import { LoginUser } from "./application/use-cases/LoginUser";
 import { AuthController } from "./interfaces/controllers/AuthController";
+import { preferencesRouter } from "./interfaces/routes/preferences.routes";
 const app = express();
 
 const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
@@ -48,6 +49,9 @@ app.get("/", (_req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/ping", pingRouter);
 app.use("/api/music", musicRouter);
+
+// Agregamos el router de preferencias
+app.use("/api/preferences", preferencesRouter);
 
 const PORT = process.env.PORT || 3000;
 

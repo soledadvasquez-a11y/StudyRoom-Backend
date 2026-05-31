@@ -1,3 +1,4 @@
+// archivo de src/infrastructure/repositories/SupabaseUserRepository.ts
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { UserRepositoryPort } from "../../application/ports/UserRepositoryPort";
 import { UserEntity } from "../../domain/entities/UserEntity";
