@@ -1,5 +1,7 @@
+// src/application/use-cases/RegisterUser.ts
 import bcrypt from "bcrypt";
 import { UserRepositoryPort } from "../ports/UserRepositoryPort";
+import { generateAuthToken } from "../../shared/auth/jwt";
 
 export class RegisterUser {
   constructor(private userRepository: UserRepositoryPort) {}
@@ -8,12 +10,13 @@ export class RegisterUser {
     email: string,
     username: string,
     plainPassword: string,
-  ): Promise<{ id: string; email: string; user: string }> {
-    // validar que no exista el email
+  ): Promise<{ id: string; email: string; user: string; token: string }> {
     const existing = await this.userRepository.findByEmail(email);
-    if (existing) throw new Error("Email already registered");
 
-    // hash password
+    if (existing) {
+      throw new Error("Email already registered");
+    }
+
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     const newUser = await this.userRepository.create({
@@ -22,7 +25,17 @@ export class RegisterUser {
       password: hashedPassword,
     });
 
-    // no devolver el password
-    return { id: newUser.id, email: newUser.email, user: newUser.username };
+    const token = generateAuthToken({
+      id: newUser.id,
+      email: newUser.email,
+      username: newUser.username,
+    });
+
+    return {
+      id: newUser.id,
+      email: newUser.email,
+      user: newUser.username,
+      token,
+    };
   }
 }

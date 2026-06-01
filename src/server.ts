@@ -11,6 +11,7 @@ import { taskRouter } from "./interfaces/routes/task.routes";
 import { SupabaseUserRepository } from "./infrastructure/repositories/SupabaseUserRepository";
 import { RegisterUser } from "./application/use-cases/RegisterUser";
 import { LoginUser } from "./application/use-cases/LoginUser";
+import { UpdateUsername } from "./application/use-cases/UpdateUsername";
 import { AuthController } from "./interfaces/controllers/AuthController";
 const app = express();
 
@@ -18,7 +19,8 @@ const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
 const userRepo = new SupabaseUserRepository();
 const registerUseCase = new RegisterUser(userRepo);
 const loginUseCase = new LoginUser(userRepo);
-const authController = new AuthController(registerUseCase, loginUseCase);
+const updateUsernameUseCase = new UpdateUsername(userRepo);
+const authController = new AuthController(registerUseCase, loginUseCase, updateUsernameUseCase);
 
 app.use(
   cors({
