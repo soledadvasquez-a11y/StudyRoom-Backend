@@ -6,6 +6,7 @@ import cors from "cors";
 import { authRouter } from "./interfaces/routes/auth.routes";
 import { pingRouter } from "./interfaces/routes/ping.routes";
 import { musicRouter } from "./interfaces/routes/music.routes";
+import { pomodoroRouter } from "./interfaces/routes/pomodoro.routes";
 
 import { SupabaseUserRepository } from "./infrastructure/repositories/SupabaseUserRepository";
 import { RegisterUser } from "./application/use-cases/RegisterUser";
@@ -48,6 +49,7 @@ app.get("/", (_req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/ping", pingRouter);
 app.use("/api/music", musicRouter);
+app.use("/api/pomodoro", pomodoroRouter);
 
 const PORT = process.env.PORT || 3000;
 
