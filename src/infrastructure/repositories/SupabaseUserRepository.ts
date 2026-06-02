@@ -1,3 +1,4 @@
+// archivo de src/infrastructure/repositories/SupabaseUserRepository.ts
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { UserRepositoryPort } from "../../application/ports/UserRepositoryPort";
 import { UserEntity } from "../../domain/entities/UserEntity";
@@ -20,8 +21,50 @@ export class SupabaseUserRepository implements UserRepositoryPort {
       .eq("email", email)
       .maybeSingle();
 
-    if (error) throw new Error(`Supabase error: ${error.message}`);
+    if (error) {
+      throw new Error(`Supabase error al buscar por email: ${error.message}`);
+    }
+
     if (!data) return null;
+
+    return data as UserEntity;
+  }
+
+  async findById(id: string): Promise<UserEntity | null> {
+    if (!id) return null;
+
+    const { data, error } = await this.client
+      .from("users")
+      .select("id,email,username,password")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Supabase error al buscar por id: ${error.message}`);
+    }
+
+    if (!data) return null;
+
+    return data as UserEntity;
+  }
+
+  async findByUsername(username: string): Promise<UserEntity | null> {
+    if (!username) return null;
+
+    const { data, error } = await this.client
+      .from("users")
+      .select("id,email,username,password")
+      .eq("username", username)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(
+        `Supabase error al buscar por username: ${error.message}`,
+      );
+    }
+
+    if (!data) return null;
+
     return data as UserEntity;
   }
 
@@ -33,10 +76,30 @@ export class SupabaseUserRepository implements UserRepositoryPort {
         username: user.username,
         password: user.password,
       })
-      .select("id,email,username")
+      .select("id,email,username,password")
       .single();
 
-    if (error) throw new Error(`Supabase error: ${error.message}`);
+    if (error) {
+      throw new Error(`Supabase error al crear usuario: ${error.message}`);
+    }
+
+    return data as UserEntity;
+  }
+
+  async updateUsername(id: string, username: string): Promise<UserEntity> {
+    const { data, error } = await this.client
+      .from("users")
+      .update({ username })
+      .eq("id", id)
+      .select("id,email,username,password")
+      .single();
+
+    if (error) {
+      throw new Error(
+        `Supabase error al actualizar username: ${error.message}`,
+      );
+    }
+
     return data as UserEntity;
   }
 }

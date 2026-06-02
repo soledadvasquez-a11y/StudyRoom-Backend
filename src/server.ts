@@ -6,18 +6,27 @@ import cors from "cors";
 import { authRouter } from "./interfaces/routes/auth.routes";
 import { pingRouter } from "./interfaces/routes/ping.routes";
 import { musicRouter } from "./interfaces/routes/music.routes";
+import { pomodoroRouter } from "./interfaces/routes/pomodoro.routes";
+import { taskRouter } from "./interfaces/routes/task.routes";
 
 import { SupabaseUserRepository } from "./infrastructure/repositories/SupabaseUserRepository";
 import { RegisterUser } from "./application/use-cases/RegisterUser";
 import { LoginUser } from "./application/use-cases/LoginUser";
+import { UpdateUsername } from "./application/use-cases/UpdateUsername";
 import { AuthController } from "./interfaces/controllers/AuthController";
+import { preferencesRouter } from "./interfaces/routes/preferences.routes";
 const app = express();
 
 const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
 const userRepo = new SupabaseUserRepository();
 const registerUseCase = new RegisterUser(userRepo);
 const loginUseCase = new LoginUser(userRepo);
-const authController = new AuthController(registerUseCase, loginUseCase);
+const updateUsernameUseCase = new UpdateUsername(userRepo);
+const authController = new AuthController(
+  registerUseCase,
+  loginUseCase,
+  updateUsernameUseCase,
+);
 
 app.use(
   cors({
@@ -48,6 +57,11 @@ app.get("/", (_req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/ping", pingRouter);
 app.use("/api/music", musicRouter);
+app.use("/api/pomodoro", pomodoroRouter);
+app.use("/api/tasks", taskRouter);
+
+// Agregamos el router de preferencias
+app.use("/api/preferences", preferencesRouter);
 
 const PORT = process.env.PORT || 3000;
 
