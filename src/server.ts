@@ -14,6 +14,7 @@ import { RegisterUser } from "./application/use-cases/RegisterUser";
 import { LoginUser } from "./application/use-cases/LoginUser";
 import { UpdateUsername } from "./application/use-cases/UpdateUsername";
 import { AuthController } from "./interfaces/controllers/AuthController";
+import { preferencesRouter } from "./interfaces/routes/preferences.routes";
 const app = express();
 
 const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
@@ -58,6 +59,9 @@ app.use("/api/ping", pingRouter);
 app.use("/api/music", musicRouter);
 app.use("/api/pomodoro", pomodoroRouter);
 app.use("/api/tasks", taskRouter);
+
+// Agregamos el router de preferencias
+app.use("/api/preferences", preferencesRouter);
 
 const PORT = process.env.PORT || 3000;
 
