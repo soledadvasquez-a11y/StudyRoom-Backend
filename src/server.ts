@@ -40,6 +40,11 @@ app.use(
         return callback(null, true);
       }
 
+      //Permite automáticamente cualquier entorno de prueba de Vercel
+      if (origin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+
       return callback(new Error("No permitido por CORS"));
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
